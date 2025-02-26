@@ -1,0 +1,5 @@
+https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/
+
+https://github.com/NVIDIA/k8s-device-plugin#quick-start
+
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
