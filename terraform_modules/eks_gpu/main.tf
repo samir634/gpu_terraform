@@ -2,6 +2,16 @@ provider "aws" {
   region = var.aws_region
 }
 
+data "aws_ami" "eks_gpu" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amazon-eks-node-*x86_64-nvidia-*"] 
+  }
+}
+
 # Create IAM Role for EKS Cluster
 resource "aws_iam_role" "eks_cluster_role" {
   name = "${var.cluster_name}-eks-role"
@@ -62,11 +72,15 @@ resource "aws_iam_role_policy_attachment" "gpu_nodes_cni_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
+resource "aws_iam_role_policy_attachment" "ssm_access" {
+  role       = aws_iam_role.gpu_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_launch_template" "gpu_lt" {
   name_prefix   = "${var.cluster_name}-gpu-lt"
   image_id      = data.aws_ami.eks_gpu.id # Fetches the latest GPU-enabled AMI
   instance_type = var.gpu_instance_type
-  key_name      = var.key_name
 
   # User Data Script (Base64 Encoded)
   user_data = base64encode(<<-EOF
