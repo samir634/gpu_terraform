@@ -2,15 +2,25 @@ provider "aws" {
   region = var.aws_region
 }
 
-#data "aws_ami" "eks_gpu" {
-#  most_recent = true
-#  owners      = ["amazon"]
-#
-#  filter {
-#    name   = "name"
-#    values = ["amazon-eks-node-*x86_64-nvidia-*"] 
-#  }
-#}
+data "aws_ami" "eks_gpu" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amazon-eks-node-*x86_64-nvidia-*ubuntu*"] 
+  }
+  
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
 
 # Create IAM Role for EKS Cluster
 resource "aws_iam_role" "eks_cluster_role" {
@@ -83,15 +93,7 @@ resource "aws_launch_template" "gpu_lt" {
   instance_type = var.gpu_instance_type
 
   # User Data Script (Base64 Encoded)
-  user_data = base64encode(<<-EOF
-    #!/bin/bash
-    echo "Running startup script" > /var/log/user_data.log
-    yum update -y
-    yum install -y nvidia-driver-525 cuda
-    nvidia-smi > /var/log/nvidia-check.log
-    echo "Startup complete" >> /var/log/user_data.log
-  EOF
-  )
+  user_data = templatefile("${path.module}/userdata.tmpl", {})
 
   tag_specifications {
     resource_type = "instance"
