@@ -2,15 +2,15 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "aws_ami" "eks_gpu" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amazon-eks-node-*x86_64-nvidia-*"] 
-  }
-}
+#data "aws_ami" "eks_gpu" {
+#  most_recent = true
+#  owners      = ["amazon"]
+#
+#  filter {
+#    name   = "name"
+#    values = ["amazon-eks-node-*x86_64-nvidia-*"] 
+#  }
+#}
 
 # Create IAM Role for EKS Cluster
 resource "aws_iam_role" "eks_cluster_role" {

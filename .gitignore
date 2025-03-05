@@ -14,7 +14,6 @@ terraform.tfstate.backup
 crash.log
 
 # Ignore environment-specific variable files
-terraform.tfvars
 *.auto.tfvars
 *.tfvars.json
 
